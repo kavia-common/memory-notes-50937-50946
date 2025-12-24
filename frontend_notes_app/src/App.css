@@ -269,6 +269,13 @@ input:focus, textarea:focus {
   box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
 }
 
+/* Optional toolbar search helper */
+.toolbar-search {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 /* Alerts */
 .alert {
   padding: 10px 12px;

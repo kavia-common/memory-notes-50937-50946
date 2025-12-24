@@ -18,7 +18,7 @@ function App() {
    * - No dependency on any env vars for core functionality.
    */
   const [notes, setNotes] = useState([]);
-  const [search, setSearch] = useState('');
+  const [searchQuery, setSearchQuery] = useState(''); // lifted search state
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
 
@@ -88,32 +88,27 @@ function App() {
     setEditing(null);
   };
 
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
+  // Filter notes by title or body (case-insensitive); live as user types
+  const filteredNotes = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
     if (!q) return notes;
     return notes.filter((n) => {
       const inTitle = (n.title || '').toLowerCase().includes(q);
       const inBody = (n.body || '').toLowerCase().includes(q);
-      const inTags = (n.tags || []).some((t) => t.toLowerCase().includes(q));
-      return inTitle || inBody || inTags;
+      return inTitle || inBody;
     });
-  }, [search, notes]);
+  }, [searchQuery, notes]);
 
   return (
     <div className="App">
-      <Header onAdd={handleAdd} />
+      <Header
+        onAdd={handleAdd}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onClearSearch={() => setSearchQuery('')}
+      />
       <main className="main container">
-        <section className="toolbar" style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
-          <input
-            aria-label="Search notes"
-            placeholder="Search notes…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ flex: 1 }}
-          />
-          <button className="btn" onClick={() => setSearch('')} aria-label="Clear search">Clear</button>
-        </section>
-        <NotesList notes={filtered} onEdit={handleEdit} onDelete={handleDelete} />
+        <NotesList notes={filteredNotes} onEdit={handleEdit} onDelete={handleDelete} />
       </main>
 
       <AddEditModal
